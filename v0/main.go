@@ -32,8 +32,13 @@ func Philosopher(id, iteration int, m *metrics.Metrics) {
 	for s := 1; s <= id*6; s++ {
 		fmt.Printf(" ")
 	}
+
+	m.StartEating()
+
 	fmt.Printf(" E%d\n", iteration) // Eating
 	time.Sleep(config.EatTime)
+
+	m.StopEating()
 
 	m.CycleDone(id) // Record cycle completion
 }

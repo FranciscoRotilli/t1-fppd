@@ -11,6 +11,7 @@ type Metrics struct {
 	totalWaitTime time.Duration
 	waitAmount    int
 	maxWaitTime   time.Duration
+	eating        int
 	maxEating     int
 	cycles        []int
 }
@@ -47,4 +48,20 @@ func (m *Metrics) Print() {
 	fmt.Printf("Mean Wait Time: %s\n", meanWaitTime)
 	fmt.Printf("Max Wait Time: %s\n", m.maxWaitTime)
 	fmt.Printf("Cycles per Philosopher: %v\n", m.cycles)
+	fmt.Printf("Max eating simultaneously: %d\n", m.maxEating)
+}
+
+func (m *Metrics) StartEating() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.eating++
+	if m.maxEating < m.eating {
+		m.maxEating = m.eating
+	}
+}
+
+func (m *Metrics) StopEating() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.eating--
 }
