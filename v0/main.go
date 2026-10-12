@@ -15,10 +15,7 @@ import (
 func Philosopher(id, iteration int, m *metrics.Metrics) {
 
 	// think
-	for s := 1; s <= id*6; s++ {
-		fmt.Printf(" ")
-	}
-	fmt.Printf(" T%d\n", iteration) // Thinking
+	fmt.Printf("%*s T%d\n", id*6, "", iteration) // Thinking
 	time.Sleep(config.ThinkTime)
 
 	t0 := time.Now()
@@ -29,13 +26,9 @@ func Philosopher(id, iteration int, m *metrics.Metrics) {
 
 	// eat
 
-	for s := 1; s <= id*6; s++ {
-		fmt.Printf(" ")
-	}
-
 	m.StartEating()
 
-	fmt.Printf(" E%d\n", iteration) // Eating
+	fmt.Printf("%*s E%d\n", id*6, "", iteration) // Eating
 	time.Sleep(config.EatTime)
 
 	m.StopEating()
