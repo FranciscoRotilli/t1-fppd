@@ -25,7 +25,7 @@ func Philosopher(id, iteration int, m *metrics.Metrics) {
 
 	// acquire forks (empty on v0)
 
-	m.RecordWait(time.Since(t0))
+	m.RecordWait(id, time.Since(t0))
 
 	// eat
 

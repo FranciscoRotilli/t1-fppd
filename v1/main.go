@@ -26,7 +26,7 @@ func Philosopher(id int, m *metrics.Metrics, forks []sync.Mutex) {
 		time.Sleep(config.TimeBetweenForks)
 		forks[rightFork].Lock()
 
-		m.RecordWait(time.Since(t0))
+		m.RecordWait(id, time.Since(t0))
 
 		// eat
 

@@ -11,6 +11,7 @@ type Metrics struct {
 	totalWaitTime time.Duration
 	waitAmount    int
 	maxWaitTime   time.Duration
+	maxWaitPer    []time.Duration
 	eating        int
 	maxEating     int
 	cycles        []int
@@ -18,17 +19,22 @@ type Metrics struct {
 
 func New(n int) *Metrics {
 	return &Metrics{
-		cycles: make([]int, n),
+		cycles:     make([]int, n),
+		maxWaitPer: make([]time.Duration, n),
 	}
 }
 
-func (m *Metrics) RecordWait(d time.Duration) {
+func (m *Metrics) RecordWait(id int, d time.Duration) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.totalWaitTime += d
 	m.waitAmount++
 	if d > m.maxWaitTime {
 		m.maxWaitTime = d
+	}
+
+	if d > m.maxWaitPer[id] {
+		m.maxWaitPer[id] = d
 	}
 }
 
@@ -47,6 +53,7 @@ func (m *Metrics) Print() {
 	fmt.Printf("Total Wait Time: %s\n", m.totalWaitTime)
 	fmt.Printf("Mean Wait Time: %s\n", meanWaitTime)
 	fmt.Printf("Max Wait Time: %s\n", m.maxWaitTime)
+	fmt.Printf("Max Wait Per Philosopher: %v\n", m.maxWaitPer)
 	fmt.Printf("Cycles per Philosopher: %v\n", m.cycles)
 	fmt.Printf("Max eating simultaneously: %d\n", m.maxEating)
 }
