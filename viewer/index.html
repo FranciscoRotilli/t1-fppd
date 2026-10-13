@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resultados Filósofos</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f4f3f0;
+    --surface-1: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7974;
+    --grid: #e4e3df;
+    --axis: #b9b8b2;
+    --ref: #52514e;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --series-5: #e87ba4;
+    --series-6: #008300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-0: #111110;
+      --surface-1: #1a1a19;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e86;
+      --grid: #2c2c2a;
+      --axis: #4a4a46;
+      --ref: #c3c2b7;
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --series-4: #c98500;
+      --series-5: #d55181;
+      --series-6: #008300;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --grid: #2c2c2a;
+    --axis: #4a4a46;
+    --ref: #c3c2b7;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px 48px;
+    background: var(--surface-0); color: var(--text-primary);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 0 0 2px; }
+  .sub { color: var(--text-secondary); margin: 0 0 12px; font-size: 13px; }
+  .card { background: var(--surface-1); border: 1px solid var(--grid); border-radius: 8px; padding: 16px; margin-top: 16px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+  label.chk { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .key { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+  pre { margin: 0; font-size: 12px; color: var(--text-secondary); white-space: pre-wrap; }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  th { color: var(--text-secondary); font-weight: 600; }
+  th:first-child, td:first-child { text-align: left; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { fill: var(--text-secondary); font-size: 12px; }
+  .grid line { stroke: var(--grid); }
+  .tip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--surface-1); border: 1px solid var(--axis); border-radius: 6px;
+    padding: 6px 8px; font-size: 12px; box-shadow: 0 2px 8px rgb(0 0 0 / .15);
+  }
+  .tip strong { display: block; font-size: 13px; color: var(--text-primary); }
+  .tip span { color: var(--text-secondary); }
+  .hit:hover + .dot, .hit:focus + .dot { stroke: var(--text-primary); stroke-width: 2; }
+  .bar:hover, .bar:focus { opacity: .8; }
+  #loader { border-style: dashed; text-align: center; }
+  #loader.over { border-color: var(--series-1); }
+  .muted { color: var(--text-muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Filósofos Jantando: resultados</h1>
+  <p class="sub" id="status">Carregando <code>results/</code>…</p>
+  <div class="row" id="batch-row" hidden>
+    <label for="batch"><strong>Bateria:</strong></label>
+    <select id="batch"></select>
+  </div>
+
+  <div class="card" id="loader" hidden>
+    <p>Não deu para ler <code>../results/</code> direto (o navegador bloqueia arquivos locais).</p>
+    <p>Arraste aqui <code>summary.csv</code> (e, se quiser, <code>env.txt</code>) ou
+      <input type="file" id="files" accept=".csv,.txt" multiple></p>
+    <p class="muted">Ou sirva a pasta do projeto: <code>python3 -m http.server</code> e abra <code>http://localhost:8000/viewer/</code></p>
+  </div>
+
+  <div id="content" hidden>
+    <div class="row card" id="filters"></div>
+
+    <div class="card">
+      <h2>Resumo por versão</h2>
+      <p class="sub">Tempos em ms. "máx. 1 comendo" nas versões concorrentes indica comboio.</p>
+      <div class="table-wrap"><table id="summary"></table></div>
+    </div>
+
+    <div class="card">
+      <h2>Tempo total por execução</h2>
+      <p class="sub" id="opt-note">Cada ponto é uma execução; o traço horizontal é a média da versão.</p>
+      <div id="chart-total"></div>
+    </div>
+
+    <div class="card">
+      <h2>Espera média por execução</h2>
+      <p class="sub">Tempo médio entre terminar de pensar e conseguir os dois garfos.</p>
+      <div id="chart-wait"></div>
+    </div>
+
+    <div class="card">
+      <h2>Maior espera por filósofo</h2>
+      <p class="sub">Média, entre as execuções, da maior espera de cada filósofo. Mostra (in)justiça.</p>
+      <div class="row" id="legend-per" style="margin-bottom:8px"></div>
+      <div id="chart-per"></div>
+    </div>
+
+    <div class="card">
+      <h2>Ambiente</h2>
+      <pre id="env">(env.txt não carregado)</pre>
+    </div>
+  </div>
+</main>
+<div class="tip" id="tip"></div>
+
+<script>
+const SVGNS = "http://www.w3.org/2000/svg";
+let rows = [], env = null, versions = [], visible = new Set();
+
+const $ = id => document.getElementById(id);
+const fmt = (ms, d = 1) => ms >= 1000 ? (ms / 1000).toFixed(3) + " s" : ms.toFixed(d) + " ms";
+const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+// Percentil por posição mais próxima (q entre 0 e 1)
+const pct = (a, q) => { const b = [...a].sort((x, y) => x - y); return b[Math.max(0, Math.ceil(q * b.length) - 1)]; };
+const sd = a => a.length < 2 ? 0 : Math.sqrt(a.reduce((s, x) => s + (x - mean(a)) ** 2, 0) / (a.length - 1));
+const color = v => `var(--series-${(versions.indexOf(v) % 6) + 1})`;
+
+function parseCSV(text) {
+  const [head, ...lines] = text.trim().split(/\r?\n/);
+  const cols = head.split(",");
+  return lines.filter(Boolean).map(l => {
+    const f = l.split(","), r = Object.fromEntries(cols.map((c, i) => [c, f[i]]));
+    return {
+      version: r.version, run: +r.run, total: +r.total_ms, meanWait: +r.mean_wait_ms,
+      maxWait: +r.max_wait_ms, eating: +r.max_eating,
+      per: (r.max_wait_per_philosopher_ms || "").trim().split(/\s+/).filter(Boolean).map(Number),
+    };
+  });
+}
+
+function parseEnv(text) {
+  const get = name => {
+    const m = text.match(new RegExp(name + "\\s*=\\s*([\\d.]+)(?:\\s*\\*\\s*time\\.(\\w+))?"));
+    if (!m) return null;
+    const unit = { Nanosecond: 1e-6, Microsecond: 1e-3, Millisecond: 1, Second: 1000 }[m[2]] ?? 1;
+    return +m[1] * unit;
+  };
+  return { text, think: get("ThinkTime"), eat: get("EatTime"), n: get("Philosophers"), rounds: get("Rounds") };
+}
+
+function optimum() {
+  if (!env || !env.eat || !env.n || !env.rounds) return null;
+  return env.rounds * env.n * env.eat / Math.floor(env.n / 2);
+}
+
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+function niceMax(v) {
+  const p = 10 ** Math.floor(Math.log10(v || 1)), n = v / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 4 ? 4 : n <= 5 ? 5 : 10) * p;
+}
+
+function showTip(evt, strong, rest) {
+  const t = $("tip");
+  t.replaceChildren();
+  const s = document.createElement("strong"); s.textContent = strong; t.appendChild(s);
+  for (const line of rest) {
+    const sp = document.createElement("span"); sp.textContent = line;
+    t.appendChild(sp); t.appendChild(document.createElement("br"));
+  }
+  t.style.display = "block";
+  const r = evt.target.getBoundingClientRect();
+  const x = (evt.clientX ?? r.x + r.width / 2) + 12, y = (evt.clientY ?? r.y) + 12;
+  t.style.left = Math.min(x, innerWidth - t.offsetWidth - 8) + "px";
+  t.style.top = Math.min(y, innerHeight - t.offsetHeight - 8) + "px";
+}
+const hideTip = () => { $("tip").style.display = "none"; };
+
+function bindTip(node, strong, rest) {
+  node.setAttribute("tabindex", "0");
+  node.addEventListener("pointermove", e => showTip(e, strong, rest));
+  node.addEventListener("focus", e => showTip(e, strong, rest));
+  node.addEventListener("pointerleave", hideTip);
+  node.addEventListener("blur", hideTip);
+}
+
+// Gráfico de pontos: uma coluna por versão, um ponto por execução
+function stripChart(target, key, label, ref) {
+  const vs = versions.filter(v => visible.has(v));
+  const W = 900, H = 300, m = { l: 64, r: 16, t: 16, b: 32 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const data = rows.filter(r => visible.has(r.version));
+  const top = niceMax(Math.max(...data.map(r => r[key]), ref || 0) * 1.05);
+  const y = v => m.t + ph - (v / top) * ph;
+  const band = pw / Math.max(vs.length, 1);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": label });
+
+  const g = el("g", { class: "grid" }, svg);
+  for (let i = 0; i <= 5; i++) {
+    const v = top * i / 5;
+    el("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v) }, g);
+    el("text", { x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }, svg).textContent = fmt(v, 0);
+  }
+  if (ref) {
+    el("line", { x1: m.l, x2: W - m.r, y1: y(ref), y2: y(ref), stroke: "var(--ref)", "stroke-dasharray": "4 4", "stroke-width": 1.5 }, svg);
+    el("text", { x: W - m.r, y: y(ref) + 16, "text-anchor": "end" }, svg).textContent = "ótimo teórico " + fmt(ref);
+  }
+
+  vs.forEach((v, i) => {
+    const cx = m.l + band * (i + .5), pts = data.filter(r => r.version === v);
+    el("text", { x: cx, y: H - 8, "text-anchor": "middle", style: "fill:var(--text-primary);font-weight:600" }, svg).textContent = v;
+    const avg = mean(pts.map(r => r[key]));
+    el("line", { x1: cx - band * .3, x2: cx + band * .3, y1: y(avg), y2: y(avg), stroke: color(v), "stroke-width": 2, "stroke-linecap": "round" }, svg);
+    const spread = Math.min(band * .5, 120);
+    pts.forEach((r, j) => {
+      const x = cx + (pts.length > 1 ? (j / (pts.length - 1) - .5) * spread : 0);
+      const hit = el("circle", { cx: x, cy: y(r[key]), r: 12, fill: "transparent", class: "hit" }, svg);
+      el("circle", { cx: x, cy: y(r[key]), r: 4.5, fill: color(v), stroke: "var(--surface-1)", "stroke-width": 2, class: "dot", "pointer-events": "none" }, svg);
+      bindTip(hit, fmt(r[key]), [`${v} · execução ${r.run}`, `máx. comendo: ${r.eating}`]);
+    });
+  });
+  $(target).replaceChildren(svg);
+}
+
+// Barras agrupadas: um grupo por filósofo, uma barra por versão
+function perChart() {
+  const vs = versions.filter(v => visible.has(v));
+  const n = Math.max(0, ...rows.map(r => r.per.length));
+  const avg = {};
+  for (const v of vs) {
+    const pts = rows.filter(r => r.version === v && r.per.length);
+    avg[v] = Array.from({ length: n }, (_, p) => pts.length ? mean(pts.map(r => r.per[p] ?? 0)) : 0);
+  }
+  const W = 900, H = 280, m = { l: 64, r: 16, t: 16, b: 32 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const top = niceMax(Math.max(1, ...vs.flatMap(v => avg[v])) * 1.05);
+  const y = v => m.t + ph - (v / top) * ph;
+  const group = pw / Math.max(n, 1), bw = Math.min(28, (group * .8) / Math.max(vs.length, 1));
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Maior espera por filósofo" });
+  const g = el("g", { class: "grid" }, svg);
+  for (let i = 0; i <= 5; i++) {
+    const v = top * i / 5;
+    el("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v) }, g);
+    el("text", { x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }, svg).textContent = fmt(v, 0);
+  }
+  for (let p = 0; p < n; p++) {
+    const gx = m.l + group * p + (group - bw * vs.length) / 2;
+    el("text", { x: m.l + group * (p + .5), y: H - 8, "text-anchor": "middle", style: "fill:var(--text-primary);font-weight:600" }, svg).textContent = "P" + p;
+    vs.forEach((v, i) => {
+      const val = avg[v][p], x = gx + i * bw, h = Math.max(0, y(0) - y(val));
+      const r = Math.min(4, bw / 2 - 1, h);
+      const d = `M${x + 1},${y(0)} V${y(val) + r} q0,${-r} ${r},${-r} H${x + bw - 1 - r} q${r},0 ${r},${r} V${y(0)} Z`;
+      const bar = el("path", { d: h > 0 ? d : "", fill: color(v), class: "bar" }, svg);
+      const hit = el("rect", { x, y: m.t, width: bw, height: ph, fill: "transparent" }, svg);
+      bindTip(hit, fmt(val), [`${v} · P${p}`, "média da maior espera"]);
+      hit.addEventListener("pointerenter", () => bar.style.opacity = .75);
+      hit.addEventListener("pointerleave", () => bar.style.opacity = "");
+    });
+  }
+  $("chart-per").replaceChildren(svg);
+
+  const leg = $("legend-per"); leg.replaceChildren();
+  for (const v of vs) {
+    const s = document.createElement("span"); s.className = "row"; s.style.gap = "6px";
+    const k = document.createElement("span"); k.className = "key"; k.style.background = color(v); k.style.borderRadius = "2px";
+    const t = document.createElement("span"); t.textContent = v;
+    s.append(k, t); leg.appendChild(s);
+  }
+}
+
+function summaryTable() {
+  const tbl = $("summary"); tbl.replaceChildren();
+  const head = ["versão", "execuções", "total (média ± dp)", "mediana", "p95", "total mín–máx", "espera média", "maior espera", "máx. comendo", "máx. 1 comendo"];
+  const tr = tbl.insertRow();
+  for (const h of head) { const th = document.createElement("th"); th.textContent = h; tr.appendChild(th); }
+  for (const v of versions) {
+    const pts = rows.filter(r => r.version === v), t = pts.map(r => r.total), e = pts.map(r => r.eating);
+    const ones = e.filter(x => x === 1).length;
+    const cells = [
+      v, pts.length,
+      `${fmt(mean(t))} ± ${fmt(sd(t))}`,
+      fmt(pct(t, .5)), fmt(pct(t, .95)),
+      `${fmt(Math.min(...t))} – ${fmt(Math.max(...t))}`,
+      fmt(mean(pts.map(r => r.meanWait)), 2),
+      fmt(Math.max(...pts.map(r => r.maxWait)), 2),
+      Math.min(...e) === Math.max(...e) ? e[0] : `${Math.min(...e)}–${Math.max(...e)}`,
+      Math.max(...e) > 1 ? `${ones} de ${pts.length}` : "—",
+    ];
+    const row = tbl.insertRow();
+    cells.forEach((c, i) => {
+      const td = row.insertCell(); td.textContent = c;
+      if (i === 0) { const k = document.createElement("span"); k.className = "key"; k.style.background = color(v); k.style.marginRight = "6px"; td.prepend(k); }
+    });
+  }
+}
+
+function filters() {
+  const f = $("filters"); f.replaceChildren();
+  const t = document.createElement("strong"); t.textContent = "Versões:"; f.appendChild(t);
+  for (const v of versions) {
+    const l = document.createElement("label"); l.className = "chk";
+    const c = document.createElement("input"); c.type = "checkbox"; c.checked = visible.has(v);
+    c.addEventListener("change", () => { c.checked ? visible.add(v) : visible.delete(v); render(); });
+    const k = document.createElement("span"); k.className = "key"; k.style.background = color(v);
+    const s = document.createElement("span"); s.textContent = v;
+    l.append(c, k, s); f.appendChild(l);
+  }
+  const note = document.createElement("span"); note.className = "muted";
+  note.textContent = "(a V0 começa desligada: o tempo dela achata a escala)"; f.appendChild(note);
+}
+
+function render() {
+  const opt = optimum();
+  $("opt-note").textContent = "Cada ponto é uma execução; o traço horizontal é a média da versão." +
+    (opt ? ` Linha tracejada: ótimo teórico = rodadas × N × comer ÷ ⌊N/2⌋ = ${fmt(opt)}.` : "");
+  stripChart("chart-total", "total", "Tempo total por execução", opt);
+  stripChart("chart-wait", "meanWait", "Espera média por execução", null);
+  perChart();
+}
+
+function load(csv, envText) {
+  rows = parseCSV(csv);
+  versions = [...new Set(rows.map(r => r.version))];
+  visible = new Set(versions.filter(v => v !== "v0"));
+  env = envText ? parseEnv(envText) : null;
+  $("env").textContent = envText || "(env.txt não carregado)";
+  $("status").textContent = `${rows.length} execuções de ${versions.length} versões` +
+    (env && env.n ? ` · N = ${env.n}, pensar ${env.think} ms, comer ${env.eat} ms, ${env.rounds} rodadas` : "");
+  $("loader").hidden = true; $("content").hidden = false;
+  filters(); summaryTable(); render();
+}
+
+async function readFiles(list) {
+  let csv = null, envText = null;
+  for (const f of list) {
+    const text = await f.text();
+    if (f.name.endsWith(".csv")) csv = text; else envText = text;
+  }
+  if (csv) load(csv, envText);
+}
+
+$("files").addEventListener("change", e => readFiles(e.target.files));
+const loader = $("loader");
+loader.addEventListener("dragover", e => { e.preventDefault(); loader.classList.add("over"); });
+loader.addEventListener("dragleave", () => loader.classList.remove("over"));
+loader.addEventListener("drop", e => { e.preventDefault(); loader.classList.remove("over"); readFiles(e.dataTransfer.files); });
+
+// Uma bateria por pasta em results/ (lista de diretórios do python -m http.server)
+async function loadBatch(dir) {
+  const csv = await fetch(`../results/${dir}/summary.csv`).then(r => { if (!r.ok) throw 0; return r.text(); });
+  const envText = await fetch(`../results/${dir}/env.txt`).then(r => r.ok ? r.text() : null).catch(() => null);
+  location.hash = dir;
+  load(csv, envText);
+}
+
+(async () => {
+  try {
+    const html = await fetch("../results/").then(r => { if (!r.ok) throw 0; return r.text(); });
+    const dirs = [...html.matchAll(/href="([^"?/]+)\/"/g)].map(m => decodeURIComponent(m[1])).sort();
+    if (!dirs.length) throw 0;
+    const sel = $("batch");
+    for (const d of dirs) { const o = document.createElement("option"); o.value = o.textContent = d; sel.appendChild(o); }
+    sel.value = dirs.includes(location.hash.slice(1)) ? location.hash.slice(1) : dirs[dirs.length - 1];
+    sel.addEventListener("change", () => loadBatch(sel.value));
+    $("batch-row").hidden = false;
+    await loadBatch(sel.value);
+  } catch {
+    $("status").textContent = "Nenhum resultado carregado.";
+    loader.hidden = false;
+  }
+})();
+</script>
+</body>
+</html>
