@@ -1,0 +1,125 @@
+
+[P1]  [P2]  [P3]  [P4]  [P5]
+                               T1
+                   T1
+       T1
+                         T1
+             T1
+ T1
+fatal error: all goroutines are asleep - deadlock!
+
+goroutine 1 [sync.WaitGroup.Wait]:
+sync.runtime_SemacquireWaitGroup(0x569868?, 0xe0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:114 +0x2e
+sync.(*WaitGroup).Wait(0x2240d27400d0)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:206 +0x85
+main.main()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:63 +0x1f1
+
+goroutine 7 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x4?, 0x38?, 0x0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x2240d274a2d8)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:149 +0x15a
+internal/sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/mutex.go:46
+main.Philosopher(0x0, 0x2240d276a1e0, {0x2240d274a2d0, 0x6, 0x0?})
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:24 +0x26e
+main.main.func1()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:59 +0x27
+sync.(*WaitGroup).Go.func1()
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:258 +0x4a
+created by sync.(*WaitGroup).Go in goroutine 1
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:238 +0x7d
+
+goroutine 8 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0xa?, 0x38?, 0x0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x2240d274a2e0)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:149 +0x15a
+internal/sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/mutex.go:46
+main.Philosopher(0x1, 0x2240d276a1e0, {0x2240d274a2d0, 0x6, 0x0?})
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:24 +0x26e
+main.main.func1()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:59 +0x27
+sync.(*WaitGroup).Go.func1()
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:258 +0x4a
+created by sync.(*WaitGroup).Go in goroutine 1
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:238 +0x7d
+
+goroutine 9 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x10?, 0x38?, 0x0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x2240d274a2e8)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:149 +0x15a
+internal/sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/mutex.go:46
+main.Philosopher(0x2, 0x2240d276a1e0, {0x2240d274a2d0, 0x6, 0x0?})
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:24 +0x26e
+main.main.func1()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:59 +0x27
+sync.(*WaitGroup).Go.func1()
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:258 +0x4a
+created by sync.(*WaitGroup).Go in goroutine 1
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:238 +0x7d
+
+goroutine 10 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x16?, 0x38?, 0x0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x2240d274a2f0)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:149 +0x15a
+internal/sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/mutex.go:46
+main.Philosopher(0x3, 0x2240d276a1e0, {0x2240d274a2d0, 0x6, 0x0?})
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:24 +0x26e
+main.main.func1()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:59 +0x27
+sync.(*WaitGroup).Go.func1()
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:258 +0x4a
+created by sync.(*WaitGroup).Go in goroutine 1
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:238 +0x7d
+
+goroutine 11 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x1c?, 0x38?, 0x0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x2240d274a2f8)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:149 +0x15a
+internal/sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/mutex.go:46
+main.Philosopher(0x4, 0x2240d276a1e0, {0x2240d274a2d0, 0x6, 0x0?})
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:24 +0x26e
+main.main.func1()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:59 +0x27
+sync.(*WaitGroup).Go.func1()
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:258 +0x4a
+created by sync.(*WaitGroup).Go in goroutine 1
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:238 +0x7d
+
+goroutine 12 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x22?, 0x38?, 0x0?)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x2240d274a2d0)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:149 +0x15a
+internal/sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/mutex.go:46
+main.Philosopher(0x5, 0x2240d276a1e0, {0x2240d274a2d0, 0x6, 0x0?})
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:24 +0x26e
+main.main.func1()
+	/home/francisco/Documents/PUCRS/S05/FPPD/t1/t1-fppd/v1/main.go:59 +0x27
+sync.(*WaitGroup).Go.func1()
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:258 +0x4a
+created by sync.(*WaitGroup).Go in goroutine 1
+	/home/francisco/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.2.linux-amd64/src/sync/waitgroup.go:238 +0x7d
