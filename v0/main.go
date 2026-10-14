@@ -37,7 +37,7 @@ func Philosopher(id, iteration int, m *metrics.Metrics) {
 }
 
 func main() {
-	fmt.Println("\n[P1]  [P2]  [P3]  [P4]  [P5]")
+	fmt.Println("\n[P0]  [P1]  [P2]  [P3]  [P4]")
 
 	// run philosophers
 

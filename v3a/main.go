@@ -44,7 +44,7 @@ func Philosopher(id int, m *metrics.Metrics, forks []sync.Mutex) {
 func main() {
 	forks := make([]sync.Mutex, config.Philosophers)
 
-	fmt.Println("\n[P1]  [P2]  [P3]  [P4]  [P5]")
+	fmt.Println("\n[P0]  [P1]  [P2]  [P3]  [P4]")
 
 	// run philosophers
 
